@@ -360,7 +360,7 @@
         .tree-scroll-content {
             min-width: max-content;
             min-height: max-content;
-            padding: 20px 15px 20px 5px;
+            padding: 20px 15px 20px 5px; /* Back to original 5px left padding */
             display: inline-block;
             transform-origin: top left;
             transition: transform 0.3s ease;
@@ -754,13 +754,16 @@
         .spouse-pair::after {
             content: '♥';
             position: absolute;
-            left: -22px; /* Aligned with toggle button */
+            left: -20px; /* Match line at 10px position */
             top: 50%;
-            transform: translateY(calc(-50% + 15px)); /* Move down below toggle */
+            transform: translate(-50%, calc(-50% + 22px)); /* Center horizontally on line, move down below toggle */
             color: var(--gold-500);
             font-size: 16px;
             z-index: 5;
             pointer-events: none;
+            /* DEBUG */
+            
+            
         }
         
         .controls-bar {
@@ -1641,13 +1644,16 @@
         .spouse-pair::after {
             content: '♥';
             position: absolute;
-            left: -13px; /* Align with toggle CENTER (-22px + 9px = -13px, center of 18px toggle) */
-            top: calc(50% + 22px); /* Move down from center */
-            transform: translateX(-50%); /* Center horizontally only */
+            left: -20px; /* Match line at 10px position */
+            top: 50%;
+            transform: translate(-50%, calc(-50% + 22px)); /* Center horizontally on line, move down below toggle */
             color: var(--gold-500);
             font-size: 16px;
             z-index: 5;
             pointer-events: none;
+            /* DEBUG */
+            
+            
         }
         
         /* Hide heart on root-level spouse pairs */
@@ -1837,7 +1843,7 @@
         .tree-root.mobile-vertical::before {
             content: '';
             position: absolute;
-            left: 5px;
+            left: 10px; /* Safe position inside padding */
             top: 0;
             bottom: 0;
             width: 2px;
@@ -1845,13 +1851,13 @@
             opacity: 0.3;
         }
         
-        /* Toggle button - centered vertically on EVERY row */
+        /* Toggle button - centered vertically on EVERY row, fixed at line position */
         .fold-toggle {
             position: absolute;
-            left: 0; /* Start from tree-node's left edge */
-            margin-left: -22px; /* Move further left to avoid heart */
+            left: -20px !important; /* Position to align with line at 10px (10px - 30px padding = -20px from tree-node) */
+            margin-left: 0 !important; /* No margin */
             top: 50%; /* Center vertically */
-            transform: translateY(-50%); /* Perfect vertical centering */
+            transform: translate(-50%, -50%); /* Center both horizontally and vertically */
             width: 18px;
             height: 18px;
             background: var(--gold-500);
@@ -2935,7 +2941,7 @@
             
             // Mobile-safe rendering: Limit depth to prevent crashes
             // Testing showed depth 4 can be unstable, depth 3 should be safer
-            const MAX_DEPTH = 3; // Conservative limit for mobile browsers
+            const MAX_DEPTH = 10; // Render full tree depth (safe with smart rendering)
             console.log('🔒 Max render depth set to', MAX_DEPTH, 'for mobile compatibility');
             
             let totalPeopleRendered = 0; // Track total DOM elements created
@@ -4541,11 +4547,46 @@ return `
             }
         });
         
-    console.log('✅ Full app loaded successfully with MAX_DEPTH=4');
+    console.log('✅ Full app loaded successfully with MAX_DEPTH=10');
+    
+    // DEBUG: Log actual computed positions
+    setTimeout(() => {
+        const treeRoot = document.querySelector('.tree-root.mobile-vertical');
+        const toggles = document.querySelectorAll('.fold-toggle');
+        
+        if (treeRoot) {
+            const rootStyles = window.getComputedStyle(treeRoot);
+            const lineStyles = window.getComputedStyle(treeRoot, '::before');
+            console.log('📏 TREE-ROOT position:', rootStyles.position);
+            console.log('📏 TREE-ROOT padding-left:', rootStyles.paddingLeft);
+            console.log('📏 VERTICAL LINE ::before left:', lineStyles.left);
+            console.log('📏 VERTICAL LINE ::before display:', lineStyles.display);
+            console.log('📏 VERTICAL LINE ::before content:', lineStyles.content);
+            console.log('📏 VERTICAL LINE ::before background:', lineStyles.background);
+        }
+        
+        if (toggles.length > 0) {
+            const toggle = toggles[0];
+            const toggleStyles = window.getComputedStyle(toggle);
+            const rect = toggle.getBoundingClientRect();
+            const parent = toggle.parentElement;
+            const parentRect = parent.getBoundingClientRect();
+            
+            console.log('📏 TOGGLE[0] CSS left:', toggleStyles.left);
+            console.log('📏 TOGGLE[0] margin-left:', toggleStyles.marginLeft);
+            console.log('📏 TOGGLE[0] position:', toggleStyles.position);
+            console.log('📏 TOGGLE[0] transform:', toggleStyles.transform);
+            console.log('📏 TOGGLE[0] actual rect.left:', rect.left + 'px from viewport');
+            console.log('📏 PARENT rect.left:', parentRect.left + 'px from viewport');
+            console.log('📏 TOGGLE offset from parent:', (rect.left - parentRect.left) + 'px');
+        }
+        
+        console.log('📏 Total toggles found:', toggles.length);
+    }, 1000);
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v6.1.0 - SMART RENDER: 1 Full + Collapsed Cards</div>
+    <div class="version-info">v6.2.4-DEBUG - Enhanced logging + line at 10px</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
