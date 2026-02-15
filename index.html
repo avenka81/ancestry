@@ -2883,33 +2883,39 @@
         
         // Mobile vertical tree renderer
         function renderMobileTree(rootPerson) {
-            debug('📱 renderMobileTree called with:', rootPerson ? rootPerson.name : 'null');
+            console.log('📱 START renderMobileTree:', rootPerson ? rootPerson.name : 'null');
             let html = '';
             const rendered = new Set();
             
+            // TESTING: Render only the root person, NO children
+            console.log('🧪 TEST MODE: Rendering ONLY root person, no children');
+            
             function renderPersonMobile(person, generation = 0) {
+                console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
                 if (!person) {
                     console.warn('⚠️ renderPersonMobile called with null person');
                     return '';
                 }
                 if (rendered.has(person.id)) {
-                    debug('⏭️ Skipping already rendered:', person.name);
+                    console.log('  ⏭️ Already rendered:', person.name);
                     return '';
                 }
                 rendered.add(person.id);
-                debug('✏️ Rendering:', person.name, 'at generation', generation);
+                console.log('  ✏️ Rendering:', person.name, 'at generation', generation);
                 
                 let output = '';
                 const spouse = person.spouseId ? personMap[person.spouseId] : null;
                 const hasSpouse = spouse && !rendered.has(spouse.id);
                 
+                console.log('  📝 Creating card HTML for:', person.name);
                 // Create person card HTML
                 const cardHtml = renderPersonCard(person, generation);
+                console.log('  ✅ Card HTML created');
                 const spouseCardHtml = hasSpouse ? renderPersonCard(spouse, generation) : '';
+                console.log('  ✅ Spouse card HTML created (if needed)');
                 
                 if (hasSpouse) {
-                    debug('💑 Rendering spouse pair:', person.name, '&', spouse.name);
-                    debug('   🔘 Adding toggle for person ID:', person.id, 'at generation:', generation);
+                    console.log('  💑 Rendering spouse pair');
                     rendered.add(spouse.id);
                     output += `<div class="tree-node" data-generation="${generation}">
                         <div class="fold-toggle expanded" data-person-id="${person.id}" onclick="toggleFold('fold-${person.id}', event)"></div>
@@ -2919,31 +2925,39 @@
                         </div>
                     </div>`;
                 } else {
-                    debug('👤 Rendering single person:', person.name);
-                    debug('   🔘 Adding toggle for person ID:', person.id, 'at generation:', generation);
+                    console.log('  👤 Rendering single person');
                     output += `<div class="tree-node" data-generation="${generation}">
                         <div class="fold-toggle expanded" data-person-id="${person.id}" onclick="toggleFold('fold-${person.id}', event)"></div>
                         <div class="single-person">${cardHtml}</div>
                     </div>`;
                 }
                 
+                // SKIP CHILDREN FOR TESTING
+                console.log('  🚫 SKIPPING children (test mode)');
+                /*
                 // Render children
+                console.log('  🔍 Finding children of:', person.name);
                 const children = familyData.filter(p => 
                     (p.fatherId === person.id || p.motherId === person.id) &&
                     !rendered.has(p.id)
                 );
                 
-                debug('👶 Children of', person.name, ':', children.length);
+                console.log('  👶 Children found:', children.length, 'for', person.name);
                 
                 if (children.length > 0) {
                     const foldId = `fold-${person.id}`;
                     output += `<div class="children-container expanded" id="${foldId}">`;
-                    children.forEach(child => {
+                    console.log('  🔄 Recursing into children...');
+                    children.forEach((child, idx) => {
+                        console.log('    Child', idx + 1, 'of', children.length, ':', child.name);
                         output += renderPersonMobile(child, generation + 1);
                     });
                     output += '</div>';
+                    console.log('  ✅ Children rendering complete');
                 }
+                */
                 
+                console.log('  ← Returning from:', person.name);
                 return output;
             }
             
@@ -3428,7 +3442,13 @@ return `
             displayPeopleList();
             console.log('✅ displayPeopleList completed');
             
+            console.log('🎯 About to call renderTree()...');
+            console.log('   Container exists?', !!document.getElementById('treeContainer'));
+            console.log('   familyData length:', familyData.length);
+            console.log('   personMap size:', Object.keys(personMap).length);
+            
             renderTree();
+            
             console.log('✅ PHASE 5B: renderTree completed! (renderMobileTree worked!)');
         } catch (error) {
             console.error('❌ renderTree failed:', error.message, error.stack);
@@ -4443,7 +4463,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.2 - PHASE 5B: renderTree ENABLED</div>
+    <div class="version-info">v5.5.4 - TEST: 1 PERSON ONLY, NO CHILDREN</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
