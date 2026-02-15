@@ -2887,9 +2887,9 @@
             let html = '';
             const rendered = new Set();
             
-            // TESTING: Render root + children (depth 6)
-            console.log('🧪 TEST MODE: Rendering to depth 6 (binary search)');
-            const MAX_DEPTH = 6; // Test depth 6
+            // TESTING: Render root + children (depth 5)
+            console.log('🧪 TEST MODE: Rendering to depth 5 (binary search)');
+            const MAX_DEPTH = 5; // Test depth 5
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -4464,7 +4464,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.7 - TEST: DEPTH 6</div>
+    <div class="version-info">v5.5.8 - TEST: DEPTH 5</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
