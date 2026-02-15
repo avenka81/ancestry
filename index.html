@@ -2888,9 +2888,11 @@
             const rendered = new Set();
             
             // Mobile-safe rendering: Limit depth to prevent crashes
-            // Depth 4 works reliably on all devices, depth 5+ can crash mobile Safari
-            const MAX_DEPTH = 4; // Safe limit for mobile browsers
+            // Testing showed depth 4 can be unstable, depth 3 should be safer
+            const MAX_DEPTH = 3; // Conservative limit for mobile browsers
             console.log('🔒 Max render depth set to', MAX_DEPTH, 'for mobile compatibility');
+            
+            let totalPeopleRendered = 0; // Track total DOM elements created
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -2903,7 +2905,8 @@
                     return '';
                 }
                 rendered.add(person.id);
-                console.log('  ✏️ Rendering:', person.name, 'at generation', generation);
+                totalPeopleRendered++; // Increment counter
+                console.log('  ✏️ Rendering:', person.name, 'at generation', generation, '(total so far:', totalPeopleRendered, ')');
                 
                 let output = '';
                 const spouse = person.spouseId ? personMap[person.spouseId] : null;
@@ -2983,8 +2986,9 @@
             }
             
             const result = renderPersonMobile(rootPerson, 0);
-            debug('📱 Mobile tree HTML length:', result.length, 'characters');
-            debug('📱 Total people rendered:', rendered.size);
+            console.log('📱 Mobile tree HTML length:', result.length, 'characters');
+            console.log('📱 Total people rendered in this tree:', totalPeopleRendered);
+            console.log('📱 Unique people (rendered set):', rendered.size);
             return result;
         }
         
@@ -3042,8 +3046,10 @@
             
             // Build HTML for all root families
             let allTreesHTML = '';
+            let grandTotalPeople = 0;
             
             rootsWithDescendants.forEach((rootInfo, index) => {
+                console.log(`🌳 Rendering tree ${index + 1} of ${rootsWithDescendants.length}: ${rootInfo.root.name}`);
                 const treeHTML = renderMobileTree(rootInfo.root);
                 
                 // Add separator line between families (except after the last one)
@@ -3055,6 +3061,13 @@
             });
             
             container.innerHTML = `<div class="tree-root mobile-vertical">${allTreesHTML}</div>`;
+            
+            // Count total rendered cards in DOM
+            const totalCards = container.querySelectorAll('.node-card').length;
+            console.log('📊 GRAND TOTAL: ', totalCards, 'people cards rendered across all trees');
+            console.log('📊 Total family trees:', rootsWithDescendants.length);
+            console.log('📊 HTML size:', Math.round(allTreesHTML.length / 1024), 'KB');
+            
             debug('✅ Rendered', rootsWithDescendants.length, 'family trees');
         }
         
@@ -4456,7 +4469,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v6.0.0 - MOBILE FIXED (MAX_DEPTH=4)</div>
+    <div class="version-info">v6.0.1 - DEPTH=3 + PEOPLE COUNT</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
