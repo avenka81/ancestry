@@ -2887,8 +2887,9 @@
             let html = '';
             const rendered = new Set();
             
-            // TESTING: Render only the root person, NO children
-            console.log('🧪 TEST MODE: Rendering ONLY root person, no children');
+            // TESTING: Render root + children (depth 1 only)
+            console.log('🧪 TEST MODE: Rendering root + children (depth 1 ONLY, no grandchildren)');
+            const MAX_DEPTH = 1; // Only go 1 level deep
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -2932,30 +2933,30 @@
                     </div>`;
                 }
                 
-                // SKIP CHILDREN FOR TESTING
-                console.log('  🚫 SKIPPING children (test mode)');
-                /*
-                // Render children
-                console.log('  🔍 Finding children of:', person.name);
-                const children = familyData.filter(p => 
-                    (p.fatherId === person.id || p.motherId === person.id) &&
-                    !rendered.has(p.id)
-                );
-                
-                console.log('  👶 Children found:', children.length, 'for', person.name);
-                
-                if (children.length > 0) {
-                    const foldId = `fold-${person.id}`;
-                    output += `<div class="children-container expanded" id="${foldId}">`;
-                    console.log('  🔄 Recursing into children...');
-                    children.forEach((child, idx) => {
-                        console.log('    Child', idx + 1, 'of', children.length, ':', child.name);
-                        output += renderPersonMobile(child, generation + 1);
-                    });
-                    output += '</div>';
-                    console.log('  ✅ Children rendering complete');
+                // TEST: Render children ONLY if we haven't hit max depth
+                if (generation < MAX_DEPTH) {
+                    console.log('  🔍 Finding children of:', person.name, '(depth', generation, '/', MAX_DEPTH, ')');
+                    const children = familyData.filter(p => 
+                        (p.fatherId === person.id || p.motherId === person.id) &&
+                        !rendered.has(p.id)
+                    );
+                    
+                    console.log('  👶 Children found:', children.length, 'for', person.name);
+                    
+                    if (children.length > 0) {
+                        const foldId = `fold-${person.id}`;
+                        output += `<div class="children-container expanded" id="${foldId}">`;
+                        console.log('  🔄 Recursing into children...');
+                        children.forEach((child, idx) => {
+                            console.log('    Child', idx + 1, 'of', children.length, ':', child.name);
+                            output += renderPersonMobile(child, generation + 1);
+                        });
+                        output += '</div>';
+                        console.log('  ✅ Children rendering complete');
+                    }
+                } else {
+                    console.log('  🛑 Max depth reached, skipping children');
                 }
-                */
                 
                 console.log('  ← Returning from:', person.name);
                 return output;
@@ -4463,7 +4464,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.4 - TEST: 1 PERSON ONLY, NO CHILDREN</div>
+    <div class="version-info">v5.5.5 - TEST: DEPTH 1 (Root + Children only)</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
