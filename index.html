@@ -2887,12 +2887,9 @@
             let html = '';
             const rendered = new Set();
             
-            // Mobile-safe rendering: Limit depth to prevent crashes
-            // Testing showed depth 4 can be unstable, depth 3 should be safer
-            const MAX_DEPTH = 3; // Conservative limit for mobile browsers
-            console.log('🔒 Max render depth set to', MAX_DEPTH, 'for mobile compatibility');
-            
-            let totalPeopleRendered = 0; // Track total DOM elements created
+            // TESTING: Render root + children (depth 4)
+            console.log('🧪 TEST MODE: Rendering to depth 4 (verifying)');
+            const MAX_DEPTH = 4; // Verify depth 4 still works
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -2905,8 +2902,7 @@
                     return '';
                 }
                 rendered.add(person.id);
-                totalPeopleRendered++; // Increment counter
-                console.log('  ✏️ Rendering:', person.name, 'at generation', generation, '(total so far:', totalPeopleRendered, ')');
+                console.log('  ✏️ Rendering:', person.name, 'at generation', generation);
                 
                 let output = '';
                 const spouse = person.spouseId ? personMap[person.spouseId] : null;
@@ -2937,7 +2933,7 @@
                     </div>`;
                 }
                 
-                // Render children up to max depth
+                // TEST: Render children ONLY if we haven't hit max depth
                 if (generation < MAX_DEPTH) {
                     console.log('  🔍 Finding children of:', person.name, '(depth', generation, '/', MAX_DEPTH, ')');
                     const children = familyData.filter(p => 
@@ -2959,7 +2955,7 @@
                         console.log('  ✅ Children rendering complete');
                     }
                 } else {
-                    console.log('  🛑 Max depth', MAX_DEPTH, 'reached - stopping to prevent mobile crash');
+                    console.log('  🛑 Max depth reached, skipping children');
                 }
                 
                 console.log('  ← Returning from:', person.name);
@@ -2986,9 +2982,8 @@
             }
             
             const result = renderPersonMobile(rootPerson, 0);
-            console.log('📱 Mobile tree HTML length:', result.length, 'characters');
-            console.log('📱 Total people rendered in this tree:', totalPeopleRendered);
-            console.log('📱 Unique people (rendered set):', rendered.size);
+            debug('📱 Mobile tree HTML length:', result.length, 'characters');
+            debug('📱 Total people rendered:', rendered.size);
             return result;
         }
         
@@ -3046,10 +3041,8 @@
             
             // Build HTML for all root families
             let allTreesHTML = '';
-            let grandTotalPeople = 0;
             
             rootsWithDescendants.forEach((rootInfo, index) => {
-                console.log(`🌳 Rendering tree ${index + 1} of ${rootsWithDescendants.length}: ${rootInfo.root.name}`);
                 const treeHTML = renderMobileTree(rootInfo.root);
                 
                 // Add separator line between families (except after the last one)
@@ -3061,13 +3054,6 @@
             });
             
             container.innerHTML = `<div class="tree-root mobile-vertical">${allTreesHTML}</div>`;
-            
-            // Count total rendered cards in DOM
-            const totalCards = container.querySelectorAll('.node-card').length;
-            console.log('📊 GRAND TOTAL: ', totalCards, 'people cards rendered across all trees');
-            console.log('📊 Total family trees:', rootsWithDescendants.length);
-            console.log('📊 HTML size:', Math.round(allTreesHTML.length / 1024), 'KB');
-            
             debug('✅ Rendered', rootsWithDescendants.length, 'family trees');
         }
         
@@ -3450,20 +3436,26 @@ return `
         console.log('   personMap created:', Object.keys(personMap).length, 'people');
         console.log('   Generations calculated');
         
-        // FINAL: Enable everything with mobile-safe depth limit
-        console.log('🎉 FINAL VERSION: All features enabled with MAX_DEPTH=4 for mobile safety');
+        // PHASE 5B: Enable renderTree (which calls renderMobileTree)
+        console.log('🧪 PHASE 5B: Testing renderTree → renderMobileTree...');
         
         try {
             displayPeopleList();
             console.log('✅ displayPeopleList completed');
             
+            console.log('🎯 About to call renderTree()...');
+            console.log('   Container exists?', !!document.getElementById('treeContainer'));
+            console.log('   familyData length:', familyData.length);
+            console.log('   personMap size:', Object.keys(personMap).length);
+            
             renderTree();
-            console.log('✅ renderTree completed with depth limit!');
+            
+            console.log('✅ PHASE 5B: renderTree completed! (renderMobileTree worked!)');
         } catch (error) {
-            console.error('❌ Rendering failed:', error.message, error.stack);
+            console.error('❌ renderTree failed:', error.message, error.stack);
             document.body.innerHTML = `
                 <div style="padding: 20px; background: #1a1a1a; color: #fff; font-family: sans-serif;">
-                    <h1 style="color: #ff6b6b;">Rendering Failed</h1>
+                    <h1 style="color: #ff6b6b;">Phase 5B Failed: renderTree/renderMobileTree Error</h1>
                     <p><strong>Error:</strong> ${error.message}</p>
                     <p><strong>Stack:</strong></p>
                     <pre style="background: #000; padding: 10px; overflow: auto; font-size: 11px;">${error.stack}</pre>
@@ -3471,7 +3463,8 @@ return `
             `;
         }
         
-        // Enable all remaining code
+        // REST STILL COMMENTED OUT
+        /*
         
         // ===== DATA MANAGER FUNCTIONS =====
         
@@ -4465,11 +4458,13 @@ return `
             }
         });
         
-    console.log('✅ Full app loaded successfully with MAX_DEPTH=4');
+        // END OF ENABLED CODE - REST IS COMMENTED OUT
+        */
+    console.log('✅ PHASE 4 loaded successfully');
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v6.0.1 - DEPTH=3 + PEOPLE COUNT</div>
+    <div class="version-info">v5.5.9 - VERIFY: DEPTH 4</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
