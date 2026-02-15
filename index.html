@@ -2887,9 +2887,10 @@
             let html = '';
             const rendered = new Set();
             
-            // TESTING: Render root + children (depth 4)
-            console.log('🧪 TEST MODE: Rendering to depth 4 (verifying)');
-            const MAX_DEPTH = 4; // Verify depth 4 still works
+            // Mobile-safe rendering: Limit depth to prevent crashes
+            // Depth 4 works reliably on all devices, depth 5+ can crash mobile Safari
+            const MAX_DEPTH = 4; // Safe limit for mobile browsers
+            console.log('🔒 Max render depth set to', MAX_DEPTH, 'for mobile compatibility');
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -2933,7 +2934,7 @@
                     </div>`;
                 }
                 
-                // TEST: Render children ONLY if we haven't hit max depth
+                // Render children up to max depth
                 if (generation < MAX_DEPTH) {
                     console.log('  🔍 Finding children of:', person.name, '(depth', generation, '/', MAX_DEPTH, ')');
                     const children = familyData.filter(p => 
@@ -2955,7 +2956,7 @@
                         console.log('  ✅ Children rendering complete');
                     }
                 } else {
-                    console.log('  🛑 Max depth reached, skipping children');
+                    console.log('  🛑 Max depth', MAX_DEPTH, 'reached - stopping to prevent mobile crash');
                 }
                 
                 console.log('  ← Returning from:', person.name);
@@ -3436,26 +3437,20 @@ return `
         console.log('   personMap created:', Object.keys(personMap).length, 'people');
         console.log('   Generations calculated');
         
-        // PHASE 5B: Enable renderTree (which calls renderMobileTree)
-        console.log('🧪 PHASE 5B: Testing renderTree → renderMobileTree...');
+        // FINAL: Enable everything with mobile-safe depth limit
+        console.log('🎉 FINAL VERSION: All features enabled with MAX_DEPTH=4 for mobile safety');
         
         try {
             displayPeopleList();
             console.log('✅ displayPeopleList completed');
             
-            console.log('🎯 About to call renderTree()...');
-            console.log('   Container exists?', !!document.getElementById('treeContainer'));
-            console.log('   familyData length:', familyData.length);
-            console.log('   personMap size:', Object.keys(personMap).length);
-            
             renderTree();
-            
-            console.log('✅ PHASE 5B: renderTree completed! (renderMobileTree worked!)');
+            console.log('✅ renderTree completed with depth limit!');
         } catch (error) {
-            console.error('❌ renderTree failed:', error.message, error.stack);
+            console.error('❌ Rendering failed:', error.message, error.stack);
             document.body.innerHTML = `
                 <div style="padding: 20px; background: #1a1a1a; color: #fff; font-family: sans-serif;">
-                    <h1 style="color: #ff6b6b;">Phase 5B Failed: renderTree/renderMobileTree Error</h1>
+                    <h1 style="color: #ff6b6b;">Rendering Failed</h1>
                     <p><strong>Error:</strong> ${error.message}</p>
                     <p><strong>Stack:</strong></p>
                     <pre style="background: #000; padding: 10px; overflow: auto; font-size: 11px;">${error.stack}</pre>
@@ -3463,8 +3458,7 @@ return `
             `;
         }
         
-        // REST STILL COMMENTED OUT
-        /*
+        // Enable all remaining code
         
         // ===== DATA MANAGER FUNCTIONS =====
         
@@ -4458,13 +4452,11 @@ return `
             }
         });
         
-        // END OF ENABLED CODE - REST IS COMMENTED OUT
-        */
-    console.log('✅ PHASE 4 loaded successfully');
+    console.log('✅ Full app loaded successfully with MAX_DEPTH=4');
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.9 - VERIFY: DEPTH 4</div>
+    <div class="version-info">v6.0.0 - MOBILE FIXED (MAX_DEPTH=4)</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
