@@ -1942,13 +1942,10 @@
     </div>
     
     <script>
-    /*
-    ===== ALL JAVASCRIPT DISABLED FOR MOBILE TESTING =====
-    Uncomment sections one by one to isolate the crash
-    */
-    console.log('🧪 TESTING MODE: All JavaScript disabled except this log');
-    /*
-        let familyData = [
+    console.log('🧪 PHASE 1: Testing familyData array only');
+    
+    // PHASE 1: Just the data array - no processing
+    let familyData = [
             {id: 1, name: "Ramaswamy", sex: "Male", born: "1825", until: "", spouseId: 2, imageId: ""},
             {id: 2, name: "Meenakshy", sex: "Female", born: "1835", until: "", spouseId: 1, imageId: ""},
             {id: 3, name: "Seshadri", sex: "Male", born: "1865", until: "", spouseId: 4, fatherId: 1, motherId: 2, imageId: ""},
@@ -2086,6 +2083,12 @@
             {id: 135, name: "Apurva", sex: "Female", born: "", until: "", fatherId: 132, motherId: 133, imageId: ""}
         ];
         
+        console.log('✅ PHASE 1: familyData loaded -', familyData.length, 'people');
+        console.log('   First person:', familyData[0].name);
+        console.log('   Last person:', familyData[familyData.length - 1].name);
+        
+        // REST OF JAVASCRIPT STILL COMMENTED OUT
+        /*
         console.log('🌳 Family Tree App v5.3.2 - Loaded');
         
         // Debug mode - set to false for production
@@ -4455,7 +4458,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.4.0 - TEST: JS DISABLED</div>
+    <div class="version-info">v5.4.1 - PHASE 1: DATA ONLY</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
