@@ -1,13 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World Test</title>
+    <title>Family Tree - No JavaScript Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #e8e8e8;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        
+        .info {
+            color: #ffd93d;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+        }
+        
+        .tree-container {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .person-card {
+            background: linear-gradient(135deg, rgba(248, 246, 240, 0.12) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .person-card.male {
+            border-color: rgba(74, 158, 255, 0.4);
+        }
+        
+        .person-card.female {
+            border-color: rgba(255, 107, 157, 0.4);
+        }
+        
+        .person-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #d4af37;
+            flex-shrink: 0;
+        }
+        
+        .person-image-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .person-info {
+            flex: 1;
+        }
+        
+        .person-name {
+            color: #d4af37;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .person-details {
+            color: #b8b8b8;
+            font-size: 14px;
+        }
+        
+        .generation {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>If you see this, GitHub Pages is working!</p>
-    <p>Test Date: February 14, 2026</p>
+    <h1>🌳 Family Tree - Static Test (No JavaScript)</h1>
+    <div class="info">
+        ✅ If you see this page with the list below, HTML and CSS are working fine!<br>
+        The issue is in the JavaScript code.
+    </div>
+    
+    <div class="tree-container">
+        <h2 style="color: #d4af37; margin-bottom: 20px;">Family Members (First 20)</h2>
+        
+        <div class="person-card male">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Ramaswamy</div>
+                <div class="person-details">
+                    <span class="generation">Gen 1</span>
+                    Born: 1825 | Male
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Meenakshy</div>
+                <div class="person-details">
+                    <span class="generation">Gen 1</span>
+                    Born: 1835 | Female | Spouse: Ramaswamy
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Seshadri</div>
+                <div class="person-details">
+                    <span class="generation">Gen 2</span>
+                    Born: 1865 | Male | Parents: Ramaswamy & Meenakshy
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Seshambal</div>
+                <div class="person-details">
+                    <span class="generation">Gen 2</span>
+                    Born: 1871 | Female | Spouse: Seshadri
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Plakkod</div>
+                <div class="person-details">
+                    <span class="generation">Gen 3</span>
+                    Born: 1887 | Male | Parents: Seshadri & Seshambal
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Mahadevan</div>
+                <div class="person-details">
+                    <span class="generation">Gen 3</span>
+                    Born: 1889 - 1979 | Male | Parents: Seshadri & Seshambal
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Ramaswamy</div>
+                <div class="person-details">
+                    <span class="generation">Gen 3</span>
+                    Born: 1891 | Male | Parents: Seshadri & Seshambal
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Parvathy</div>
+                <div class="person-details">
+                    <span class="generation">Gen 3</span>
+                    Female | Spouse: Mahadevan
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <img src="https://lh3.googleusercontent.com/d/1EdGoK5XUalBQ_363CJIFfBsQIiYqnRMq" class="person-image" onerror="this.style.display='none'">
+            <div class="person-info">
+                <div class="person-name">Radha</div>
+                <div class="person-details">
+                    <span class="generation">Gen 6</span>
+                    Female | Spouse: Sundaram
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <img src="https://lh3.googleusercontent.com/d/1gs4-UN2i8kreTe2CPtuGY852TKBl57-0" class="person-image" onerror="this.style.display='none'">
+            <div class="person-info">
+                <div class="person-name">Mahadevan (Murali)</div>
+                <div class="person-details">
+                    <span class="generation">Gen 7</span>
+                    Male | Parents: Sundaram & Radha
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <img src="https://lh3.googleusercontent.com/d/1-Zmw2oU-YZHECRgZDy_A03pa6pXRtxXV" class="person-image" onerror="this.style.display='none'">
+            <div class="person-info">
+                <div class="person-name">Shalini</div>
+                <div class="person-details">
+                    <span class="generation">Gen 7</span>
+                    Female | Spouse: Mahadevan (Murali)
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <img src="https://lh3.googleusercontent.com/d/1R4tTnaw9uewCcfeFMyNliqUmP-HQ90Ho" class="person-image" onerror="this.style.display='none'">
+            <div class="person-info">
+                <div class="person-name">Amrit</div>
+                <div class="person-details">
+                    <span class="generation">Gen 8</span>
+                    Male | Parents: Mahadevan (Murali) & Shalini
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card female">
+            <div class="person-image-placeholder"></div>
+            <div class="person-info">
+                <div class="person-name">Ayusha</div>
+                <div class="person-details">
+                    <span class="generation">Gen 8</span>
+                    Female | Parents: Mahadevan (Murali) & Shalini
+                </div>
+            </div>
+        </div>
+        
+        <div class="person-card male">
+            <img src="https://lh3.googleusercontent.com/d/1oP2lQb5R4KoI4DDGYrEdgyoIAJltxel4" class="person-image" onerror="this.style.display='none'">
+            <div class="person-info">
+                <div class="person-name">Venkateswaran (Ganesh)</div>
+                <div class="person-details">
+                    <span class="generation">Gen 7</span>
+                    Male | Parents: Sundaram & Radha
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin-top: 30px; color: #888; text-align: center;">
+            Showing 14 of 135 family members<br>
+            <strong style="color: #d4af37;">This is a static test page with no JavaScript</strong>
+        </p>
+    </div>
 </body>
 </html>
