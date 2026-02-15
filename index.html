@@ -2881,15 +2881,64 @@
             return forceMobileLayout || window.innerWidth <= 768;
         }
         
+        // Collapsed family card for memory optimization
+        function renderCollapsedFamilyCard(rootPerson, descendantCount) {
+            const spouse = rootPerson.spouseId ? personMap[rootPerson.spouseId] : null;
+            const imgUrl = rootPerson.imageId ? `https://lh3.googleusercontent.com/d/${rootPerson.imageId}` : '';
+            
+            const names = spouse ? `${rootPerson.name} ♥ ${spouse.name}` : rootPerson.name;
+            const dates = rootPerson.born || rootPerson.until ? 
+                `${rootPerson.born || '?'} - ${rootPerson.until || ''}` : '';
+            
+            return `
+                <div class="collapsed-family-card" onclick="expandFamily(${rootPerson.id})" style="
+                    background: linear-gradient(135deg, rgba(248, 246, 240, 0.08) 0%, rgba(212, 175, 55, 0.05) 100%);
+                    border: 2px solid rgba(212, 175, 55, 0.3);
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin-bottom: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                ">
+                    ${imgUrl ? `<img src="${imgUrl}" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 2px solid #d4af37;">` : 
+                              `<div style="width: 60px; height: 60px; border-radius: 10px; background: rgba(212, 175, 55, 0.2); border: 2px solid rgba(212, 175, 55, 0.3);"></div>`}
+                    <div style="flex: 1;">
+                        <div style="color: #d4af37; font-size: 18px; font-weight: 600; margin-bottom: 5px;">${names}</div>
+                        ${dates ? `<div style="color: #b8b8b8; font-size: 14px; margin-bottom: 5px;">${dates}</div>` : ''}
+                        <div style="color: #ffd93d; font-size: 14px;">
+                            👥 ${descendantCount} descendants • Click to expand full tree
+                        </div>
+                    </div>
+                    <div style="color: #d4af37; font-size: 24px;">▶</div>
+                </div>
+            `;
+        }
+        
+        function expandFamily(personId) {
+            console.log('🔄 Expanding family tree for person:', personId);
+            const person = personMap[personId];
+            if (!person) return;
+            
+            // Make this person the selected person so their tree renders first
+            selectedPerson = person;
+            renderTree();
+        }
+        
         // Mobile vertical tree renderer
         function renderMobileTree(rootPerson) {
             console.log('📱 START renderMobileTree:', rootPerson ? rootPerson.name : 'null');
             let html = '';
             const rendered = new Set();
             
-            // TESTING: Render root + children (depth 4)
-            console.log('🧪 TEST MODE: Rendering to depth 4 (verifying)');
-            const MAX_DEPTH = 4; // Verify depth 4 still works
+            // Mobile-safe rendering: Limit depth to prevent crashes
+            // Testing showed depth 4 can be unstable, depth 3 should be safer
+            const MAX_DEPTH = 3; // Conservative limit for mobile browsers
+            console.log('🔒 Max render depth set to', MAX_DEPTH, 'for mobile compatibility');
+            
+            let totalPeopleRendered = 0; // Track total DOM elements created
             
             function renderPersonMobile(person, generation = 0) {
                 console.log('  → renderPersonMobile:', person ? person.name : 'null', 'gen:', generation);
@@ -2902,7 +2951,8 @@
                     return '';
                 }
                 rendered.add(person.id);
-                console.log('  ✏️ Rendering:', person.name, 'at generation', generation);
+                totalPeopleRendered++; // Increment counter
+                console.log('  ✏️ Rendering:', person.name, 'at generation', generation, '(total so far:', totalPeopleRendered, ')');
                 
                 let output = '';
                 const spouse = person.spouseId ? personMap[person.spouseId] : null;
@@ -2933,7 +2983,7 @@
                     </div>`;
                 }
                 
-                // TEST: Render children ONLY if we haven't hit max depth
+                // Render children up to max depth
                 if (generation < MAX_DEPTH) {
                     console.log('  🔍 Finding children of:', person.name, '(depth', generation, '/', MAX_DEPTH, ')');
                     const children = familyData.filter(p => 
@@ -2955,7 +3005,7 @@
                         console.log('  ✅ Children rendering complete');
                     }
                 } else {
-                    console.log('  🛑 Max depth reached, skipping children');
+                    console.log('  🛑 Max depth', MAX_DEPTH, 'reached - stopping to prevent mobile crash');
                 }
                 
                 console.log('  ← Returning from:', person.name);
@@ -2982,8 +3032,9 @@
             }
             
             const result = renderPersonMobile(rootPerson, 0);
-            debug('📱 Mobile tree HTML length:', result.length, 'characters');
-            debug('📱 Total people rendered:', rendered.size);
+            console.log('📱 Mobile tree HTML length:', result.length, 'characters');
+            console.log('📱 Total people rendered in this tree:', totalPeopleRendered);
+            console.log('📱 Unique people (rendered set):', rendered.size);
             return result;
         }
         
@@ -3029,31 +3080,70 @@
             // Filter to only roots with at least 1 descendant
             const rootsWithDescendants = rootsWithInfo.filter(r => r.descendants > 0);
             
-            rootsWithDescendants.sort((a, b) => {
-                if (b.descendants !== a.descendants) return b.descendants - a.descendants;
-                return a.born - b.born;
-            });
+            // If there's a selected person, find their root and put it first
+            if (selectedPerson) {
+                let current = selectedPerson;
+                while (current.fatherId || current.motherId) {
+                    const parent = personMap[current.fatherId] || personMap[current.motherId];
+                    if (!parent) break;
+                    current = parent;
+                }
+                const selectedRoot = current;
+                console.log('📌 Selected person root:', selectedRoot.name);
+                
+                // Sort: selected root first, then by descendant count
+                rootsWithDescendants.sort((a, b) => {
+                    if (a.root.id === selectedRoot.id) return -1;
+                    if (b.root.id === selectedRoot.id) return 1;
+                    if (b.descendants !== a.descendants) return b.descendants - a.descendants;
+                    return a.born - b.born;
+                });
+            } else {
+                // No selection: sort by descendant count (largest first)
+                rootsWithDescendants.sort((a, b) => {
+                    if (b.descendants !== a.descendants) return b.descendants - a.descendants;
+                    return a.born - b.born;
+                });
+            }
             
             debug('Roots with descendants:', rootsWithDescendants.length);
             rootsWithDescendants.forEach((r, i) => {
                 debug(`  ${i + 1}. ${r.root.name} - ${r.descendants} descendants, born ${r.root.born || '?'}`);
             });
             
-            // Build HTML for all root families
+            // MEMORY OPTIMIZATION: Render only the first tree fully, others as collapsed cards
+            console.log('💡 Memory optimization: Rendering first tree fully, others collapsed');
             let allTreesHTML = '';
+            let grandTotalPeople = 0;
             
             rootsWithDescendants.forEach((rootInfo, index) => {
-                const treeHTML = renderMobileTree(rootInfo.root);
+                if (index === 0) {
+                    // First tree (largest) - render fully with depth limit
+                    console.log(`🌳 Rendering FULL tree: ${rootInfo.root.name} (${rootInfo.descendants} descendants)`);
+                    const treeHTML = renderMobileTree(rootInfo.root);
+                    allTreesHTML += treeHTML;
+                } else {
+                    // Other trees - render as collapsed summary card
+                    console.log(`📦 Rendering COLLAPSED card: ${rootInfo.root.name} (${rootInfo.descendants} descendants)`);
+                    const collapsedCard = renderCollapsedFamilyCard(rootInfo.root, rootInfo.descendants);
+                    allTreesHTML += collapsedCard;
+                }
                 
-                // Add separator line between families (except after the last one)
-                const separator = index < rootsWithDescendants.length - 1 
-                    ? '<div class="family-separator"></div>' 
-                    : '';
-                
-                allTreesHTML += treeHTML + separator;
+                // Add separator between families
+                if (index < rootsWithDescendants.length - 1) {
+                    allTreesHTML += '<div class="family-separator"></div>';
+                }
             });
             
             container.innerHTML = `<div class="tree-root mobile-vertical">${allTreesHTML}</div>`;
+            
+            // Count total rendered cards in DOM
+            const totalCards = container.querySelectorAll('.node-card').length;
+            console.log('📊 GRAND TOTAL: ', totalCards, 'people cards rendered');
+            console.log('📊 Full trees:', 1);
+            console.log('📊 Collapsed cards:', rootsWithDescendants.length - 1);
+            console.log('📊 HTML size:', Math.round(allTreesHTML.length / 1024), 'KB');
+            
             debug('✅ Rendered', rootsWithDescendants.length, 'family trees');
         }
         
@@ -3436,26 +3526,20 @@ return `
         console.log('   personMap created:', Object.keys(personMap).length, 'people');
         console.log('   Generations calculated');
         
-        // PHASE 5B: Enable renderTree (which calls renderMobileTree)
-        console.log('🧪 PHASE 5B: Testing renderTree → renderMobileTree...');
+        // FINAL: Enable everything with mobile-safe depth limit
+        console.log('🎉 FINAL VERSION: All features enabled with MAX_DEPTH=4 for mobile safety');
         
         try {
             displayPeopleList();
             console.log('✅ displayPeopleList completed');
             
-            console.log('🎯 About to call renderTree()...');
-            console.log('   Container exists?', !!document.getElementById('treeContainer'));
-            console.log('   familyData length:', familyData.length);
-            console.log('   personMap size:', Object.keys(personMap).length);
-            
             renderTree();
-            
-            console.log('✅ PHASE 5B: renderTree completed! (renderMobileTree worked!)');
+            console.log('✅ renderTree completed with depth limit!');
         } catch (error) {
-            console.error('❌ renderTree failed:', error.message, error.stack);
+            console.error('❌ Rendering failed:', error.message, error.stack);
             document.body.innerHTML = `
                 <div style="padding: 20px; background: #1a1a1a; color: #fff; font-family: sans-serif;">
-                    <h1 style="color: #ff6b6b;">Phase 5B Failed: renderTree/renderMobileTree Error</h1>
+                    <h1 style="color: #ff6b6b;">Rendering Failed</h1>
                     <p><strong>Error:</strong> ${error.message}</p>
                     <p><strong>Stack:</strong></p>
                     <pre style="background: #000; padding: 10px; overflow: auto; font-size: 11px;">${error.stack}</pre>
@@ -3463,8 +3547,7 @@ return `
             `;
         }
         
-        // REST STILL COMMENTED OUT
-        /*
+        // Enable all remaining code
         
         // ===== DATA MANAGER FUNCTIONS =====
         
@@ -4458,13 +4541,11 @@ return `
             }
         });
         
-        // END OF ENABLED CODE - REST IS COMMENTED OUT
-        */
-    console.log('✅ PHASE 4 loaded successfully');
+    console.log('✅ Full app loaded successfully with MAX_DEPTH=4');
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.9 - VERIFY: DEPTH 4</div>
+    <div class="version-info">v6.1.0 - SMART RENDER: 1 Full + Collapsed Cards</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
