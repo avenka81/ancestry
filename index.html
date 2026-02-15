@@ -3421,18 +3421,19 @@ return `
         console.log('   personMap created:', Object.keys(personMap).length, 'people');
         console.log('   Generations calculated');
         
-        // PHASE 5: ENABLE RENDERING
-        console.log('🧪 PHASE 5: Enabling rendering functions...');
+        // PHASE 5A: Test displayPeopleList only (skip renderTree)
+        console.log('🧪 PHASE 5A: Testing displayPeopleList only...');
         
         try {
             displayPeopleList();
-            renderTree();
-            console.log('✅ PHASE 5: Rendering completed successfully!');
+            console.log('✅ PHASE 5A: displayPeopleList completed!');
+            // renderTree(); // COMMENTED OUT FOR NOW
+            console.log('⏸️ renderTree() skipped - testing displayPeopleList only');
         } catch (error) {
-            console.error('❌ Rendering failed:', error.message, error.stack);
+            console.error('❌ displayPeopleList failed:', error.message, error.stack);
             document.body.innerHTML = `
                 <div style="padding: 20px; background: #1a1a1a; color: #fff; font-family: sans-serif;">
-                    <h1 style="color: #ff6b6b;">Phase 5 Failed: Rendering Error</h1>
+                    <h1 style="color: #ff6b6b;">Phase 5A Failed: displayPeopleList Error</h1>
                     <p><strong>Error:</strong> ${error.message}</p>
                     <p><strong>Stack:</strong></p>
                     <pre style="background: #000; padding: 10px; overflow: auto; font-size: 11px;">${error.stack}</pre>
@@ -4441,7 +4442,7 @@ return `
     </script>
     
     <!-- Version Info -->
-    <div class="version-info">v5.5.0 - PHASE 5: RENDERING ENABLED</div>
+    <div class="version-info">v5.5.1 - PHASE 5A: displayPeopleList ONLY</div>
     
     <!-- Data Manager Modal -->
     <div class="data-manager-modal" id="dataManagerModal" style="display: none; visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200000;">
